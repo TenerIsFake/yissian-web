@@ -49,7 +49,7 @@ export default function App() {
     <div className="app">
       <header className="header">
         <h1 className="logo">Yissian <span className="accent">Translator</span></h1>
-        <p className="tagline">Preserve the onset. Replace the nucleus.</p>
+        <p className="tagline">Priss the Riss. Riss the Niss.</p>
       </header>
 
       <main className="main">
@@ -115,6 +115,8 @@ export default function App() {
         <a href="https://github.com/TenerIsFake/yissian-engine">Open Source</a>
         {' · '}
         No data collected. Runs entirely in your browser.
+        <br />
+        <span className="footer-credit">app by Tendrid</span>
       </footer>
     </div>
   );
