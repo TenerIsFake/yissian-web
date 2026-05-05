@@ -49,7 +49,7 @@ export default function App() {
     <div className="app">
       <header className="header">
         <h1 className="logo">Yissian <span className="accent">Translator</span></h1>
-        <p className="tagline">Priss the Riss. Riss the Niss.</p>
+        <p className="tagline">Priss the Onsetrid; Repliss the Niss. Yiss!</p>
       </header>
 
       <main className="main">
@@ -70,7 +70,7 @@ export default function App() {
           <div className="output-box">
             {output
               ? <p className="output-text">{output}</p>
-              : <p className="placeholder">Translation appears here</p>
+              : <p className="placeholder" title={"Translation appears here\nPreserve the onset. Replace the nucleus."}>Triss iss hererid</p>
             }
           </div>
 
@@ -91,6 +91,7 @@ export default function App() {
                 <tr><td className="suffix">-rid</td><td>Completive — better → <em>bettrid</em></td></tr>
                 <tr><td className="suffix">-issin&apos;</td><td>Gerunds — fucking → <em>fissin&apos;</em></td></tr>
                 <tr><td className="suffix">+ly</td><td>Adverbs — really → <em>rissly</em></td></tr>
+                <tr><td className="suffix">y&apos;all</td><td>Lexical — y&apos;all → <em>yinz</em></td></tr>
               </tbody>
             </table>
           </section>
