@@ -96,17 +96,39 @@ export default function App() {
             </table>
           </section>
 
-          {/* AdSense — replace publisher/slot IDs after AdSense approval */}
-          <div className="ad-unit" aria-label="Advertisement">
-            <ins
-              className="adsbygoogle"
-              style={{ display: 'block' }}
-              data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
-              data-ad-slot="XXXXXXXXXX"
-              data-ad-format="auto"
-              data-full-width-responsive="true"
-            />
-          </div>
+          <section className="rules-card">
+            <h2 className="rules-title">Rules & Examples</h2>
+            <div className="rule-blocks">
+              <div className="rule-block">
+                <div className="rule-head"><span className="suffix">-iss</span><span className="rule-note">front vowels — a, e, i</span></div>
+                <div className="rule-ex">hell → <em>hiss</em> · think → <em>thiss</em> · win → <em>wiss</em></div>
+              </div>
+              <div className="rule-block">
+                <div className="rule-head"><span className="suffix">-riss</span><span className="rule-note">back/round vowels — o, ou, oo…</span></div>
+                <div className="rule-ex">go → <em>griss</em> · bold → <em>briss</em> · cool → <em>criss</em></div>
+              </div>
+              <div className="rule-block">
+                <div className="rule-head"><span className="suffix">-rid</span><span className="rule-note">completive — -er, -le, -ness, -ful…</span></div>
+                <div className="rule-ex">better → <em>bettrid</em> · apple → <em>apprid</em> · darkness → <em>darkrid</em></div>
+              </div>
+              <div className="rule-block">
+                <div className="rule-head"><span className="suffix">-issin&apos;</span><span className="rule-note">gerunds — -ing / -in&apos;</span></div>
+                <div className="rule-ex">going → <em>gissin&apos;</em> · running → <em>rissin&apos;</em> · fucking → <em>fissin&apos;</em></div>
+              </div>
+              <div className="rule-block">
+                <div className="rule-head"><span className="suffix">magic-e</span><span className="rule-note">VCe keeps vowel class</span></div>
+                <div className="rule-ex">blade → <em>bladriss</em> · cute → <em>cutrid</em> · white → <em>wiss</em></div>
+              </div>
+              <div className="rule-block">
+                <div className="rule-head"><span className="suffix">+ly</span><span className="rule-note">adverbs re-attach -ly</span></div>
+                <div className="rule-ex">really → <em>rissly</em> · badly → <em>bissly</em></div>
+              </div>
+              <div className="rule-block">
+                <div className="rule-head"><span className="suffix">lexical</span><span className="rule-note">fixed substitutions</span></div>
+                <div className="rule-ex">y&apos;all → <em>yinz</em> · yeah → <em>yiss</em> · right → <em>riss</em></div>
+              </div>
+            </div>
+          </section>
         </aside>
       </main>
 
