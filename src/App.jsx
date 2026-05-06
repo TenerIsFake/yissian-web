@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import { translateToDialect, mergeOverrides } from 'yissian-engine';
+import About from './About';
+import Read from './Read';
 import './App.css';
 
 const OVERRIDES_URL =
@@ -39,8 +41,11 @@ function ShareButton({ text }) {
   return <button className="btn" onClick={() => navigator.share({ text })} disabled={!text}>Share</button>;
 }
 
+const NAV = ['Translate', 'Read', 'About'];
+
 export default function App() {
   const [input, setInput] = useState('');
+  const [page, setPage] = useState('Translate');
   const output = input ? translateToDialect(input) : '';
 
   useEffect(() => { loadOverrides(); }, []);
@@ -48,11 +53,27 @@ export default function App() {
   return (
     <div className="app">
       <header className="header">
-        <h1 className="logo">Yissian <span className="accent">Translator</span></h1>
-        <p className="tagline" title="Preserve the onset. Replace the nucleus.">Priss the Onsetrid; Repliss the Niss. Yiss!</p>
+        <div className="header-top">
+          <div>
+            <h1 className="logo">Yissian <span className="accent">Translator</span></h1>
+            <p className="tagline" title="Preserve the onset. Replace the nucleus.">Priss the Onsetrid; Repliss the Niss. Yiss!</p>
+          </div>
+          <nav className="nav">
+            {NAV.map(p => (
+              <button
+                key={p}
+                className={`nav-btn ${page === p ? 'nav-btn--active' : ''}`}
+                onClick={() => setPage(p)}
+              >{p}</button>
+            ))}
+          </nav>
+        </div>
       </header>
 
-      <main className="main">
+      {page === 'About' && <About />}
+      {page === 'Read' && <Read />}
+
+      <main className="main" style={page !== 'Translate' ? { display: 'none' } : {}}>
         <section className="card">
           <label className="field-label">Input</label>
           <textarea
