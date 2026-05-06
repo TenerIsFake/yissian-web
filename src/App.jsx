@@ -49,7 +49,7 @@ export default function App() {
     <div className="app">
       <header className="header">
         <h1 className="logo">Yissian <span className="accent">Translator</span></h1>
-        <p className="tagline">Priss the Onsetrid; Repliss the Niss. Yiss!</p>
+        <p className="tagline" title="Preserve the onset. Replace the nucleus.">Priss the Onsetrid; Repliss the Niss. Yiss!</p>
       </header>
 
       <main className="main">
@@ -70,7 +70,7 @@ export default function App() {
           <div className="output-box">
             {output
               ? <p className="output-text">{output}</p>
-              : <p className="placeholder" title={"Translation appears here\nPreserve the onset. Replace the nucleus."}>Triss iss hererid</p>
+              : <p className="placeholder" title="Translation appears here">Triss iss hererid</p>
             }
           </div>
 

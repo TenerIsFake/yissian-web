@@ -35,7 +35,7 @@ body {
 }
 .logo { font-size: 2rem; font-weight: 800; letter-spacing: -0.02em; }
 .accent { color: var(--accent); }
-.tagline { color: var(--muted); font-size: 0.9rem; margin-top: 4px; }
+.tagline { color: var(--muted); font-size: 0.9rem; margin-top: 4px; cursor: help; }
 
 .main {
   display: grid;
