@@ -1,16 +1,14 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { translateToDialect, translatePigLatin, translatePootie, mergeOverrides } from 'yissian-engine';
 import About from './About';
 import Read from './Read';
+import Phrases from './Phrases';
+import History, { saveHistoryEntry } from './History';
 import './App.css';
 
 const DIALECTS = ['Yissian', 'Pig Latin', 'Pootie Tang'];
-
-function getTranslator(dialect) {
-  if (dialect === 'Pig Latin') return translatePigLatin;
-  if (dialect === 'Pootie Tang') return translatePootie;
-  return translateToDialect;
-}
+const INTENSITY_STEPS = [0, 25, 50, 75, 100];
+const INTENSITY_LABELS = ['Off', 'Light', 'Half', 'Most', 'Full'];
 
 const OVERRIDES_URL =
   'https://raw.githubusercontent.com/TenerIsFake/homepage-claude/master/yissian.json';
@@ -34,30 +32,110 @@ async function loadOverrides() {
   } catch { /* use bundled defaults */ }
 }
 
-function CopyButton({ text }) {
+function getBaseTranslator(dialect) {
+  if (dialect === 'Pig Latin') return translatePigLatin;
+  if (dialect === 'Pootie Tang') return translatePootie;
+  return translateToDialect;
+}
+
+function translateWithIntensity(text, intensity, translator) {
+  if (!text) return '';
+  if (intensity === 0) return text;
+  if (intensity === 100) return translator(text);
+  const level = INTENSITY_STEPS.indexOf(intensity);
+  const tokens = text.split(/(\s+)/);
+  let wordIdx = 0;
+  return tokens.map(tok => {
+    if (/^\s+$/.test(tok)) return tok;
+    return (wordIdx++ % 4) < level ? translator(tok) : tok;
+  }).join('');
+}
+
+function WordChips({ output, input }) {
+  const [active, setActive] = useState(null);
+  const outWords = output.split(' ').filter(Boolean);
+  const inWords = input.split(' ').filter(Boolean);
+  return (
+    <div className="chips-wrap">
+      {outWords.map((word, i) => {
+        const orig = inWords[i] || word;
+        const same = word.toLowerCase() === orig.toLowerCase();
+        const isActive = active === i;
+        return (
+          <span key={i} className="chip-slot">
+            <button
+              className={`chip ${!same ? 'chip--translated' : ''} ${isActive ? 'chip--active' : ''}`}
+              onClick={() => !same && setActive(isActive ? null : i)}
+              disabled={same}
+            >
+              {word}
+            </button>
+            {isActive && !same && <span className="chip-tooltip">{orig}</span>}
+          </span>
+        );
+      })}
+    </div>
+  );
+}
+
+function CopyButton({ text, onCopy }) {
   const [label, setLabel] = useState('Copy');
   const handle = async () => {
     await navigator.clipboard.writeText(text);
     setLabel('Copied!');
     setTimeout(() => setLabel('Copy'), 1500);
+    onCopy?.();
   };
   return <button className="btn" onClick={handle} disabled={!text}>{label}</button>;
 }
 
-function ShareButton({ text }) {
+function ShareButton({ input, output }) {
   if (typeof navigator === 'undefined' || !navigator.share) return null;
-  return <button className="btn" onClick={() => navigator.share({ text })} disabled={!text}>Share</button>;
+  const card = `✨ Yissian Translator\n\n"${input}"\n  ↓\n"${output}"\n\nyissian-web`;
+  return (
+    <button className="btn" onClick={() => navigator.share({ text: card })} disabled={!output}>
+      Share
+    </button>
+  );
 }
 
-const NAV = ['Translate', 'Read', 'About'];
+const NAV = ['Translate', 'Phrases', 'History', 'Read', 'About'];
 
 export default function App() {
   const [input, setInput] = useState('');
   const [page, setPage] = useState('Translate');
   const [dialect, setDialect] = useState('Yissian');
-  const output = input ? getTranslator(dialect)(input) : '';
+  const [intensity, setIntensity] = useState(100);
+  const [wordMode, setWordMode] = useState(false);
 
   useEffect(() => { loadOverrides(); }, []);
+
+  const output = useMemo(() => {
+    const tr = getBaseTranslator(dialect);
+    return translateWithIntensity(input, intensity, tr);
+  }, [input, intensity, dialect]);
+
+  const wordCountBadge = useMemo(() => {
+    const level = INTENSITY_STEPS.indexOf(intensity);
+    if (level <= 0 || level >= INTENSITY_STEPS.length - 1) return null;
+    const words = input.trim().split(/\s+/).filter(Boolean);
+    if (!words.length) return null;
+    const count = words.filter((_, i) => (i % 4) < level).length;
+    return `~${count} of ${words.length} words translated`;
+  }, [input, intensity]);
+
+  const handleSave = () => {
+    if (input && output && output !== input) {
+      saveHistoryEntry({ input, output, dialect, intensity });
+    }
+  };
+
+  const handleRestore = (entry) => {
+    setInput(entry.input);
+    setDialect(entry.dialect ?? 'Yissian');
+    setIntensity(entry.intensity ?? 100);
+    setPage('Translate');
+  };
 
   return (
     <div className="app">
@@ -90,6 +168,8 @@ export default function App() {
 
       {page === 'About' && <About />}
       {page === 'Read' && <Read dialect={dialect} />}
+      {page === 'Phrases' && <Phrases dialect={dialect} />}
+      {page === 'History' && <History onRestore={handleRestore} />}
 
       <main className="main" style={page !== 'Translate' ? { display: 'none' } : {}}>
         <section className="card">
@@ -105,17 +185,43 @@ export default function App() {
             spellCheck={false}
           />
 
-          <label className="field-label">{dialect}</label>
+          <div className="intensity-row">
+            {INTENSITY_STEPS.map((step, idx) => (
+              <button
+                key={step}
+                className={`intensity-btn ${intensity === step ? 'intensity-btn--active' : ''}`}
+                onClick={() => setIntensity(step)}
+              >
+                {INTENSITY_LABELS[idx]}
+              </button>
+            ))}
+          </div>
+          {wordCountBadge && <p className="word-count-badge">{wordCountBadge}</p>}
+
+          <div className="output-header">
+            <label className="field-label">{dialect}</label>
+            {output && (
+              <button
+                className={`word-mode-toggle ${wordMode ? 'word-mode-toggle--active' : ''}`}
+                onClick={() => setWordMode(v => !v)}
+              >
+                Word mode
+              </button>
+            )}
+          </div>
+
           <div className="output-box">
             {output
-              ? <p className="output-text">{output}</p>
+              ? wordMode
+                ? <WordChips output={output} input={input} />
+                : <p className="output-text">{output}</p>
               : <p className="placeholder" title="Translation appears here">Triss iss hererid</p>
             }
           </div>
 
           <div className="actions">
-            <CopyButton text={output} />
-            <ShareButton text={output} />
+            <CopyButton text={output} onCopy={handleSave} />
+            <ShareButton input={input} output={output} />
             <button className="btn btn-muted" onClick={() => setInput('')} disabled={!input}>Clear</button>
           </div>
         </section>
@@ -182,7 +288,7 @@ export default function App() {
                 <div className="rule-ex">hello → <em>ellohay</em> · string → <em>ingstray</em></div>
               </div>
               <div className="rule-block">
-                <div className="rule-head"><span className="suffix">qu → unit</span><span className="rule-note">"qu" treated as one consonant</span></div>
+                <div className="rule-head"><span className="suffix">qu → unit</span><span className="rule-note">&ldquo;qu&rdquo; treated as one consonant</span></div>
                 <div className="rule-ex">queen → <em>eenquay</em> · quiet → <em>ietquay</em></div>
               </div>
             </div>
