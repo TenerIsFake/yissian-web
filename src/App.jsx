@@ -1,8 +1,16 @@
 import { useState, useEffect } from 'react';
-import { translateToDialect, mergeOverrides } from 'yissian-engine';
+import { translateToDialect, translatePigLatin, translatePootie, mergeOverrides } from 'yissian-engine';
 import About from './About';
 import Read from './Read';
 import './App.css';
+
+const DIALECTS = ['Yissian', 'Pig Latin', 'Pootie Tang'];
+
+function getTranslator(dialect) {
+  if (dialect === 'Pig Latin') return translatePigLatin;
+  if (dialect === 'Pootie Tang') return translatePootie;
+  return translateToDialect;
+}
 
 const OVERRIDES_URL =
   'https://raw.githubusercontent.com/TenerIsFake/homepage-claude/master/yissian.json';
@@ -46,7 +54,8 @@ const NAV = ['Translate', 'Read', 'About'];
 export default function App() {
   const [input, setInput] = useState('');
   const [page, setPage] = useState('Translate');
-  const output = input ? translateToDialect(input) : '';
+  const [dialect, setDialect] = useState('Yissian');
+  const output = input ? getTranslator(dialect)(input) : '';
 
   useEffect(() => { loadOverrides(); }, []);
 
@@ -68,10 +77,19 @@ export default function App() {
             ))}
           </nav>
         </div>
+        <div className="dialect-nav">
+          {DIALECTS.map(d => (
+            <button
+              key={d}
+              className={`nav-btn dialect-btn ${dialect === d ? 'nav-btn--active' : ''}`}
+              onClick={() => setDialect(d)}
+            >{d}</button>
+          ))}
+        </div>
       </header>
 
       {page === 'About' && <About />}
-      {page === 'Read' && <Read />}
+      {page === 'Read' && <Read dialect={dialect} />}
 
       <main className="main" style={page !== 'Translate' ? { display: 'none' } : {}}>
         <section className="card">
@@ -87,7 +105,7 @@ export default function App() {
             spellCheck={false}
           />
 
-          <label className="field-label">Yissian</label>
+          <label className="field-label">{dialect}</label>
           <div className="output-box">
             {output
               ? <p className="output-text">{output}</p>
@@ -103,53 +121,90 @@ export default function App() {
         </section>
 
         <aside className="sidebar">
-          <section className="rules-card">
-            <h2 className="rules-title">Quick Reference</h2>
-            <table className="rules-table">
-              <tbody>
-                <tr><td className="suffix">-iss</td><td>Short/front vowels — hell → <em>hiss</em></td></tr>
-                <tr><td className="suffix">-riss</td><td>Round/back vowels — go → <em>griss</em></td></tr>
-                <tr><td className="suffix">-rid</td><td>Completive — better → <em>bettrid</em></td></tr>
-                <tr><td className="suffix">-issin&apos;</td><td>Gerunds — fucking → <em>fissin&apos;</em></td></tr>
-                <tr><td className="suffix">+ly</td><td>Adverbs — really → <em>rissly</em></td></tr>
-                <tr><td className="suffix">y&apos;all</td><td>Lexical — y&apos;all → <em>yinz</em></td></tr>
-              </tbody>
-            </table>
-          </section>
+          {dialect === 'Yissian' && <>
+            <section className="rules-card">
+              <h2 className="rules-title">Quick Reference</h2>
+              <table className="rules-table">
+                <tbody>
+                  <tr><td className="suffix">-iss</td><td>Short/front vowels — hell → <em>hiss</em></td></tr>
+                  <tr><td className="suffix">-riss</td><td>Round/back vowels — go → <em>griss</em></td></tr>
+                  <tr><td className="suffix">-rid</td><td>Completive — better → <em>bettrid</em></td></tr>
+                  <tr><td className="suffix">-issin&apos;</td><td>Gerunds — fucking → <em>fissin&apos;</em></td></tr>
+                  <tr><td className="suffix">+ly</td><td>Adverbs — really → <em>rissly</em></td></tr>
+                  <tr><td className="suffix">y&apos;all</td><td>Lexical — y&apos;all → <em>yinz</em></td></tr>
+                </tbody>
+              </table>
+            </section>
+            <section className="rules-card">
+              <h2 className="rules-title">Rules & Examples</h2>
+              <div className="rule-blocks">
+                <div className="rule-block">
+                  <div className="rule-head"><span className="suffix">-iss</span><span className="rule-note">front vowels — a, e, i</span></div>
+                  <div className="rule-ex">hell → <em>hiss</em> · think → <em>thiss</em> · win → <em>wiss</em></div>
+                </div>
+                <div className="rule-block">
+                  <div className="rule-head"><span className="suffix">-riss</span><span className="rule-note">back/round vowels — o, ou, oo…</span></div>
+                  <div className="rule-ex">go → <em>griss</em> · bold → <em>briss</em> · cool → <em>criss</em></div>
+                </div>
+                <div className="rule-block">
+                  <div className="rule-head"><span className="suffix">-rid</span><span className="rule-note">completive — -er, -le, -ness, -ful…</span></div>
+                  <div className="rule-ex">better → <em>bettrid</em> · apple → <em>apprid</em> · darkness → <em>darkrid</em></div>
+                </div>
+                <div className="rule-block">
+                  <div className="rule-head"><span className="suffix">-issin&apos;</span><span className="rule-note">gerunds — -ing / -in&apos;</span></div>
+                  <div className="rule-ex">going → <em>gissin&apos;</em> · running → <em>rissin&apos;</em> · fucking → <em>fissin&apos;</em></div>
+                </div>
+                <div className="rule-block">
+                  <div className="rule-head"><span className="suffix">magic-e</span><span className="rule-note">VCe keeps vowel class</span></div>
+                  <div className="rule-ex">blade → <em>bladriss</em> · cute → <em>cutrid</em> · white → <em>wiss</em></div>
+                </div>
+                <div className="rule-block">
+                  <div className="rule-head"><span className="suffix">+ly</span><span className="rule-note">adverbs re-attach -ly</span></div>
+                  <div className="rule-ex">really → <em>rissly</em> · badly → <em>bissly</em></div>
+                </div>
+                <div className="rule-block">
+                  <div className="rule-head"><span className="suffix">lexical</span><span className="rule-note">fixed substitutions</span></div>
+                  <div className="rule-ex">y&apos;all → <em>yinz</em> · yeah → <em>yiss</em> · right → <em>riss</em></div>
+                </div>
+              </div>
+            </section>
+          </>}
 
-          <section className="rules-card">
-            <h2 className="rules-title">Rules & Examples</h2>
+          {dialect === 'Pig Latin' && <section className="rules-card">
+            <h2 className="rules-title">Pig Latin Rules</h2>
             <div className="rule-blocks">
               <div className="rule-block">
-                <div className="rule-head"><span className="suffix">-iss</span><span className="rule-note">front vowels — a, e, i</span></div>
-                <div className="rule-ex">hell → <em>hiss</em> · think → <em>thiss</em> · win → <em>wiss</em></div>
+                <div className="rule-head"><span className="suffix">+way</span><span className="rule-note">word starts with a vowel</span></div>
+                <div className="rule-ex">apple → <em>appleway</em> · over → <em>overway</em></div>
               </div>
               <div className="rule-block">
-                <div className="rule-head"><span className="suffix">-riss</span><span className="rule-note">back/round vowels — o, ou, oo…</span></div>
-                <div className="rule-ex">go → <em>griss</em> · bold → <em>briss</em> · cool → <em>criss</em></div>
+                <div className="rule-head"><span className="suffix">cluster+ay</span><span className="rule-note">consonant cluster moves to end</span></div>
+                <div className="rule-ex">hello → <em>ellohay</em> · string → <em>ingstray</em></div>
               </div>
               <div className="rule-block">
-                <div className="rule-head"><span className="suffix">-rid</span><span className="rule-note">completive — -er, -le, -ness, -ful…</span></div>
-                <div className="rule-ex">better → <em>bettrid</em> · apple → <em>apprid</em> · darkness → <em>darkrid</em></div>
-              </div>
-              <div className="rule-block">
-                <div className="rule-head"><span className="suffix">-issin&apos;</span><span className="rule-note">gerunds — -ing / -in&apos;</span></div>
-                <div className="rule-ex">going → <em>gissin&apos;</em> · running → <em>rissin&apos;</em> · fucking → <em>fissin&apos;</em></div>
-              </div>
-              <div className="rule-block">
-                <div className="rule-head"><span className="suffix">magic-e</span><span className="rule-note">VCe keeps vowel class</span></div>
-                <div className="rule-ex">blade → <em>bladriss</em> · cute → <em>cutrid</em> · white → <em>wiss</em></div>
-              </div>
-              <div className="rule-block">
-                <div className="rule-head"><span className="suffix">+ly</span><span className="rule-note">adverbs re-attach -ly</span></div>
-                <div className="rule-ex">really → <em>rissly</em> · badly → <em>bissly</em></div>
-              </div>
-              <div className="rule-block">
-                <div className="rule-head"><span className="suffix">lexical</span><span className="rule-note">fixed substitutions</span></div>
-                <div className="rule-ex">y&apos;all → <em>yinz</em> · yeah → <em>yiss</em> · right → <em>riss</em></div>
+                <div className="rule-head"><span className="suffix">qu → unit</span><span className="rule-note">"qu" treated as one consonant</span></div>
+                <div className="rule-ex">queen → <em>eenquay</em> · quiet → <em>ietquay</em></div>
               </div>
             </div>
-          </section>
+          </section>}
+
+          {dialect === 'Pootie Tang' && <section className="rules-card">
+            <h2 className="rules-title">Pootie Tang Lexicon</h2>
+            <table className="rules-table">
+              <tbody>
+                <tr><td className="suffix">sa da tay</td><td>yes · okay · good</td></tr>
+                <tr><td className="suffix">wa da tah</td><td>hello · hi</td></tr>
+                <tr><td className="suffix">cole</td><td>cool · give</td></tr>
+                <tr><td className="suffix">sepatown</td><td>stop · separate</td></tr>
+                <tr><td className="suffix">nah</td><td>no</td></tr>
+                <tr><td className="suffix">kine</td><td>time · know</td></tr>
+                <tr><td className="suffix">mamadee</td><td>mom · mommy</td></tr>
+                <tr><td className="suffix">dame</td><td>have</td></tr>
+                <tr><td className="suffix">cherries</td><td>peas</td></tr>
+              </tbody>
+            </table>
+            <p className="rule-note" style={{marginTop:'0.75rem'}}>Unmapped words pass through unchanged — that&apos;s authentic Pootie.</p>
+          </section>}
         </aside>
       </main>
 

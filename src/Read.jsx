@@ -1,5 +1,11 @@
 import { useState, useMemo } from 'react';
-import { translateToDialect } from 'yissian-engine';
+import { translateToDialect, translatePigLatin, translatePootie } from 'yissian-engine';
+
+function getTranslator(dialect) {
+  if (dialect === 'Pig Latin') return translatePigLatin;
+  if (dialect === 'Pootie Tang') return translatePootie;
+  return translateToDialect;
+}
 
 const TEXTS = [
   {
@@ -77,15 +83,16 @@ the recklessness of their own ways destroyed them all.`,
   },
 ];
 
-export default function Read() {
+export default function Read({ dialect = 'Yissian' }) {
   const [selectedId, setSelectedId] = useState(TEXTS[0].id);
   const [showOriginal, setShowOriginal] = useState(false);
 
   const text = TEXTS.find(t => t.id === selectedId);
+  const translate = getTranslator(dialect);
 
   const translated = useMemo(
-    () => text.body.split('\n').map(line => line ? translateToDialect(line) : ''),
-    [text],
+    () => text.body.split('\n').map(line => line ? translate(line) : ''),
+    [text, translate],
   );
 
   return (
@@ -117,7 +124,7 @@ export default function Read() {
 
       <div className={`read-columns ${showOriginal ? 'read-columns--split' : ''}`}>
         <div className="read-pane">
-          <div className="read-pane-label">Yissian</div>
+          <div className="read-pane-label">{dialect}</div>
           <div className="read-body read-body--yiss">
             {translated.map((line, i) => (
               <p key={i} className={line ? 'read-line' : 'read-spacer'}>{line}</p>

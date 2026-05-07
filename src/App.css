@@ -45,6 +45,12 @@ body {
 .tagline { color: var(--muted); font-size: 0.9rem; margin-top: 4px; cursor: help; }
 
 .nav { display: flex; gap: 4px; align-items: center; flex-shrink: 0; }
+.dialect-nav {
+  display: flex;
+  gap: 4px;
+  padding-bottom: 16px;
+}
+.dialect-btn { font-size: 12px; padding: 5px 13px; }
 .nav-btn {
   background: transparent;
   border: 1px solid var(--border);
