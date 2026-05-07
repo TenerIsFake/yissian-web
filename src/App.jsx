@@ -4,6 +4,7 @@ import About from './About';
 import Read from './Read';
 import Phrases from './Phrases';
 import History, { saveHistoryEntry } from './History';
+import WebTranslate from './WebTranslate';
 import './App.css';
 
 const DIALECTS = ['Yissian', 'Pig Latin', 'Pootie Tang'];
@@ -99,7 +100,7 @@ function ShareButton({ input, output }) {
   );
 }
 
-const NAV = ['Translate', 'Phrases', 'History', 'Read', 'About'];
+const NAV = ['Translate', 'Phrases', 'History', 'Web', 'Read', 'About'];
 
 export default function App() {
   const [input, setInput] = useState('');
@@ -170,6 +171,7 @@ export default function App() {
       {page === 'Read' && <Read dialect={dialect} />}
       {page === 'Phrases' && <Phrases dialect={dialect} />}
       {page === 'History' && <History onRestore={handleRestore} />}
+      {page === 'Web' && <WebTranslate dialect={dialect} />}
 
       <main className="main" style={page !== 'Translate' ? { display: 'none' } : {}}>
         <section className="card">
