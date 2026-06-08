@@ -405,6 +405,20 @@ body {
   padding-bottom: 48px;
   line-height: 1.8;
 }
+.rules-page-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 16px 0;
+}
+.rules-page-grid .rules-card { padding: 16px 20px; }
+.rules-page-grid .rule-head { margin-bottom: 6px; }
+.rule-detail { font-size: 13px; color: var(--muted); line-height: 1.6; margin: 4px 0 8px; }
+.rule-examples { display: flex; flex-wrap: wrap; gap: 10px; }
+.rule-pair { font-size: 13px; }
+.rule-ex-in { color: var(--text); }
+.rule-arrow { color: var(--border); }
+.rule-pair em { color: var(--output); font-style: normal; font-weight: 600; }
 .about-h2 {
   font-size: 1.05rem;
   font-weight: 700;

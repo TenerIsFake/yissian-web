@@ -5,6 +5,7 @@ import Read from './Read';
 import Phrases from './Phrases';
 import History, { saveHistoryEntry } from './History';
 import WebTranslate from './WebTranslate';
+import Rules from './Rules';
 import './App.css';
 
 const DIALECTS = ['Yissian', 'Pig Latin', 'Pootie Tang'];
@@ -100,7 +101,7 @@ function ShareButton({ input, output }) {
   );
 }
 
-const NAV = ['Translate', 'Phrases', 'History', 'Web', 'Read', 'About'];
+const NAV = ['Translate', 'Phrases', 'Rules', 'History', 'Web', 'Read', 'About'];
 
 export default function App() {
   const [input, setInput] = useState('');
@@ -169,6 +170,7 @@ export default function App() {
 
       {page === 'About' && <About />}
       {page === 'Read' && <Read dialect={dialect} />}
+      {page === 'Rules' && <Rules />}
       {page === 'Phrases' && <Phrases dialect={dialect} />}
       {page === 'History' && <History onRestore={handleRestore} />}
       {page === 'Web' && <WebTranslate dialect={dialect} />}
